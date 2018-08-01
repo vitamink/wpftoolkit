@@ -230,12 +230,13 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Border BorderThickness="1"
+                    <Border x:Name="_ColorShadingCanvas_Border" BorderThickness="1"
                   BorderBrush="DarkGray"
                   ClipToBounds="True"
                   Background="{StaticResource CheckerBrush}">
                         <Canvas x:Name="PART_ColorShadingCanvas"
-                    Width="200"
+
+                    Width="{Binding ElementName=_ColorShadingCanvas_Border, Path=ActualWidth}"
                     Height="300"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top">
@@ -312,40 +313,37 @@
                         </Grid>
                     </Border>
 
-                    <Border Grid.Column="1"
+                    <Border x:Name="_SpectrumSlider_Border" Grid.Column="1"
                     Margin="4,-8,0,0"
                     ClipToBounds="False">
-                        <local:ColorSpectrumSlider Width="200" x:Name="PART_SpectrumSlider"
+                        <local:ColorSpectrumSlider Width="{Binding ElementName=_SpectrumSlider_Border, Path=ActualWidth}" x:Name="PART_SpectrumSlider"
                                            VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                         </local:ColorSpectrumSlider>
                     </Border>
 
-                    <Border Grid.Column="2"  BorderThickness="1"
+                    <Border x:Name="_IntensityCanvas_Border" Grid.Column="2" BorderThickness="1"
                   BorderBrush="DarkGray"
                   ClipToBounds="True"
                   Background="{StaticResource CheckerBrush}">
-                        <Canvas x:Name="PART_IntensityShadingCanvas"
-                    Width="200"
+                        <Canvas x:Name="PART_IntensityCanvas"
+                    Width="{Binding ElementName=_IntensityCanvas_Border, Path=ActualWidth}"
                     Height="300"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top">
                             <Rectangle x:Name="IntensityShadingRectangle"
-                         Height="{Binding ElementName=PART_IntensityShadingCanvas, Path=Height}"
-                         Width="{Binding ElementName=PART_IntensityShadingCanvas, Path=Width}"
-                         Fill="{Binding SelectedColor, ElementName=PART_SpectrumSlider, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
-                            <Rectangle x:Name="IntensityWhiteGradient"
-                         Width="{Binding ElementName=PART_IntensityShadingCanvas,Path=Width}"
-                         Height="{Binding ElementName=PART_IntensityShadingCanvas,Path=Height}">
-                                <Rectangle.Fill>
-                                    <LinearGradientBrush StartPoint="0,0"
-                                       EndPoint="0,1">
-                                        <GradientStop Offset="0"
-                                  Color="#ffffffff" />
-                                        <GradientStop Offset="1"
-                                  Color="#ff000000" />
-                                    </LinearGradientBrush>
-                                </Rectangle.Fill>
-                            </Rectangle>
+                         Height="{Binding ElementName=PART_IntensityCanvas, Path=Height}"
+                         Width="{Binding ElementName=PART_IntensityCanvas, Path=Width}"
+                          >
+                            <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0,0"
+                                                 EndPoint="0,1">
+                                <GradientStop Offset="0"
+                                              Color="#ffffffff" />
+                                <GradientStop Offset="1"
+                                              Color="#ff000000" />
+                            </LinearGradientBrush>
+                            </Rectangle.Fill>
+                                </Rectangle>
                             <!--<Rectangle x:Name="BlackGradient"
                          Width="{Binding ElementName=PART_ColorShadingCanvas,Path=Width}"
                          Height="{Binding ElementName=PART_ColorShadingCanvas,Path=Height}">
@@ -359,7 +357,7 @@
                   </LinearGradientBrush>
                 </Rectangle.Fill>
               </Rectangle>-->
-                            <Canvas x:Name="PART_IntensityShadeSelector"
+                            <Canvas x:Name="PART_IntensitySelector"
                       Width="10"
                       Height="10"
                       IsHitTestVisible="False">
