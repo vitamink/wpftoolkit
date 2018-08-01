@@ -20,6 +20,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Xceed.Wpf.Toolkit.Core.Converters;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace Xceed.Wpf.Toolkit
@@ -43,7 +44,17 @@ namespace Xceed.Wpf.Toolkit
       DefaultStyleKeyProperty.OverrideMetadata( typeof( ColorSpectrumSlider ), new FrameworkPropertyMetadata( typeof( ColorSpectrumSlider ) ) );
     }
 
-    #endregion //Constructors
+      public ColorSpectrumSlider()
+      {
+          this.Loaded += OnLoaded;
+      }
+
+      private void OnLoaded(object sender, RoutedEventArgs e)
+      {
+          
+      }
+
+      #endregion //Constructors
 
     #region Dependency Properties
 
@@ -69,7 +80,7 @@ namespace Xceed.Wpf.Toolkit
       base.OnApplyTemplate();
 
       _spectrumDisplay = ( Rectangle )GetTemplateChild( PART_SpectrumDisplay );
-      CreateSpectrum();
+        CreateSpectrum();
       OnValueChanged( Double.NaN, Value );
     }
 

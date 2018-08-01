@@ -321,7 +321,7 @@
                         Background="{StaticResource CheckerBrush}">
                   <Canvas x:Name="PART_ColorShadingCanvas"
                           Width="200"
-                          Height="100"
+                          Height="300"
                           HorizontalAlignment="Left"
                           VerticalAlignment="Top">
                     <Rectangle x:Name="ColorShadingRectangle"

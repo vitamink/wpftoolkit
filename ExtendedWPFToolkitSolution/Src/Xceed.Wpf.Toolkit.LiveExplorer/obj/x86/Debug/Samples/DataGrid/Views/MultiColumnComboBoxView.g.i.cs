@@ -10,7 +10,6 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Automation;
@@ -30,8 +29,12 @@ using System.Windows.Media.TextFormatting;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Shell;
+using Xceed.Wpf.DataGrid;
+using Xceed.Wpf.DataGrid.Converters;
+using Xceed.Wpf.DataGrid.Markup;
+using Xceed.Wpf.DataGrid.ValidationRules;
+using Xceed.Wpf.DataGrid.Views;
 using Xceed.Wpf.Toolkit.LiveExplorer;
-using Xceed.Wpf.Toolkit.LiveExplorer.Samples.DataGrid;
 using Xceed.Wpf.Toolkit.LiveExplorer.Samples.DataGrid.Converters;
 
 
