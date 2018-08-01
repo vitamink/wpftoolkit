@@ -22,42 +22,53 @@ using Xceed.Wpf.Toolkit.Core.Utilities;
 using Xceed.Wpf.Toolkit.Primitives;
 using System.IO;
 using System;
+using System.Windows.Shapes;
 
 namespace Xceed.Wpf.Toolkit
 {
-    [TemplatePart(Name = PART_ColorShadingCanvas, Type = typeof(Canvas))]
-    [TemplatePart(Name = PART_ColorShadeSelector, Type = typeof(Canvas))]
-    [TemplatePart(Name = PART_SpectrumSlider, Type = typeof(ColorSpectrumSlider))]
+    [TemplatePart(Name = PART_SaturationCanvas, Type = typeof(Canvas))]
+    [TemplatePart(Name = PART_SaturationSelector, Type = typeof(Canvas))]
+    //[TemplatePart(Name = PART_SpectrumSlider, Type = typeof(ColorSpectrumSlider))]
     [TemplatePart(Name = PART_HexadecimalTextBox, Type = typeof(TextBox))]
     public class ColorCanvas : Control
     {
-        private const string PART_ColorShadingCanvas = "PART_ColorShadingCanvas";
-        private const string PART_ColorShadeSelector = "PART_ColorShadeSelector";
-        private const string PART_SpectrumSlider = "PART_SpectrumSlider";
+        private const string PART_SaturationCanvas = "PART_SaturationCanvas";
+        private const string PART_SaturationSelector = "PART_SaturationSelector";
+        //private const string PART_SpectrumSlider = "PART_SpectrumSlider";
         private const string PART_IntensityCanvas = "PART_IntensityCanvas";
         private const string PART_IntensitySelector = "PART_IntensitySelector";
+        private const string PART_SpectrumCanvas = "PART_SpectrumCanvas";
+        private const string PART_SpectrumSelector = "PART_SpectrumSelector";
+        private const string PART_SpectrumDisplay = "PART_SpectrumDisplay";
         private const string PART_HexadecimalTextBox = "PART_HexadecimalTextBox";
 
         #region Private Members
 
-        private TranslateTransform _colorShadeSelectorTransform = new TranslateTransform();
-        private Canvas _colorShadingCanvas;
-        private Canvas _colorShadeSelector;
+        private TranslateTransform _saturationSelectorTransform = new TranslateTransform();
+        private Canvas _saturationCanvas;
+        private Canvas _saturationSelector;
 
 
         private TranslateTransform _intensitySelectorTransform = new TranslateTransform();
         private Canvas _intensityCanvas;
         private Canvas _intensitySelector;
 
+        private TranslateTransform _spectrumSelectorTransform = new TranslateTransform();
+        private Canvas _spectrumCanvas;
+        private Canvas _spectrumSelector;
+        private Rectangle _spectrumDisplay;
 
-        private ColorSpectrumSlider _spectrumSlider;
+
+
+        //private ColorSpectrumSlider _spectrumSlider;
         private TextBox _hexadecimalTextBox;
-        private Point? _currentColorPosition;
+        private Point? _currentSaturationPosition;
         private Point? _currentIntensityPosition;
+        private Point? _currentSpectrumPosition;
         private bool _surpressColorPropertyChanged;
         private bool _surpressIntensityPropertyChanged;
         private bool _updateSpectrumSliderValue = true;
-        private bool _updateColorPosition = false;
+        private bool _updateSaturationPosition = false;
         private bool _updateIntensityPosition = false;
 
         #endregion //Private Members
@@ -69,31 +80,21 @@ namespace Xceed.Wpf.Toolkit
         public static readonly DependencyProperty SelectedColorProperty = DependencyProperty.Register("SelectedColor", typeof(Color?), typeof(ColorCanvas), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedColorChanged));
         public Color? SelectedColor
         {
-            get
-            {
-                return (Color?)GetValue(SelectedColorProperty);
-            }
-            set
-            {
-                SetValue(SelectedColorProperty, value);
-            }
+            get => (Color?) GetValue(SelectedColorProperty);
+            set => SetValue(SelectedColorProperty, value);
         }
 
         private static void OnSelectedColorChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             ColorCanvas colorCanvas = o as ColorCanvas;
-            if (colorCanvas != null)
-                colorCanvas.OnSelectedColorChanged((Color?)e.OldValue, (Color?)e.NewValue);
+            colorCanvas?.OnSelectedColorChanged((Color?) e.OldValue, (Color?) e.NewValue);
         }
 
         protected virtual void OnSelectedColorChanged(Color? oldValue, Color? newValue)
         {
             SetHexadecimalStringProperty(GetFormatedColorString(newValue), false);
             UpdateRGBValues(newValue);
-            if (_updateColorPosition)
-            {
-                UpdateColorShadeSelectorPosition(newValue);
-            }
+            UpdateHueAndSaturationSelectorPositions(newValue);
 
             RoutedPropertyChangedEventArgs<Color?> args = new RoutedPropertyChangedEventArgs<Color?>(oldValue, newValue);
             args.RoutedEvent = SelectedColorChangedEvent;
@@ -102,30 +103,54 @@ namespace Xceed.Wpf.Toolkit
 
         #endregion //SelectedColor
 
+        #region SelectedHue
+
+        public static readonly DependencyProperty SelectedHueProperty = DependencyProperty.Register("SelectedHue", typeof(Color?), typeof(ColorCanvas), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedHueChanged));
+        public Color? SelectedHue
+        {
+            get => (Color?)GetValue(SelectedHueProperty);
+            set => SetValue(SelectedHueProperty, value);
+        }
+
+        private static void OnSelectedHueChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            ColorCanvas colorCanvas = o as ColorCanvas;
+            colorCanvas?.OnSelectedHueChanged((Color?)e.OldValue, (Color?)e.NewValue);
+        }
+
+        protected virtual void OnSelectedHueChanged(Color? oldValue, Color? newValue)
+        {
+            
+            //SetHexadecimalStringProperty(GetFormatedColorString(newValue), false);
+            //UpdateRGBValues(newValue);
+            //UpdateHueAndSaturationSelectorPositions(newValue);
+
+            //RoutedPropertyChangedEventArgs<Color?> args = new RoutedPropertyChangedEventArgs<Color?>(oldValue, newValue);
+            //args.RoutedEvent = SelectedColorChangedEvent;
+            //RaiseEvent(args);
+        }
+
+        #endregion //SelectedHue
+
         #region Intensity
 
         public static readonly DependencyProperty IntensityProperty = DependencyProperty.Register("Intensity", typeof(byte?), typeof(ColorCanvas), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnIntensityChanged));
         public byte? Intensity
         {
-            get
-            {
-                return (byte?)GetValue(IntensityProperty);
-            }
-            set
-            {
-                SetValue(IntensityProperty, value);
-            }
+            get => (byte?)GetValue(IntensityProperty);
+            set => SetValue(IntensityProperty, value);
         }
 
         private static void OnIntensityChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             ColorCanvas colorCanvas = o as ColorCanvas;
-            if (colorCanvas != null)
-                colorCanvas.OnIntensityChanged((byte?)e.OldValue, (byte?)e.NewValue);
+            colorCanvas?.OnIntensityChanged((byte?)e.OldValue, (byte?)e.NewValue);
         }
 
         protected virtual void OnIntensityChanged(byte? oldValue, byte? newValue)
         {
+
+            UpdateIntensitySelectorPosition(newValue);
             //SetHexadecimalStringProperty(GetFormatedColorString(newValue), false);
             //UpdateRGBValues(newValue);
             //UpdateColorShadeSelectorPosition(newValue);
@@ -295,9 +320,9 @@ namespace Xceed.Wpf.Toolkit
                     col = (Color)ColorConverter.ConvertFromString(newColorString);
                 }
 
-                _updateColorPosition = true;
+                _updateSaturationPosition = true;
                 UpdateSelectedColor(col);
-                _updateColorPosition = false;
+                _updateSaturationPosition = false;
             }
 
             SetHexadecimalTextBoxTextProperty(newValue);
@@ -392,28 +417,28 @@ namespace Xceed.Wpf.Toolkit
         {
             base.OnApplyTemplate();
 
-            if (_colorShadingCanvas != null)
+            if (_saturationCanvas != null)
             {
-                _colorShadingCanvas.MouseLeftButtonDown -= ColorShadingCanvas_MouseLeftButtonDown;
-                _colorShadingCanvas.MouseLeftButtonUp -= ColorShadingCanvas_MouseLeftButtonUp;
-                _colorShadingCanvas.MouseMove -= ColorShadingCanvas_MouseMove;
-                _colorShadingCanvas.SizeChanged -= ColorShadingCanvas_SizeChanged;
+                _saturationCanvas.MouseLeftButtonDown -= SaturationCanvasMouseLeftButtonDown;
+                _saturationCanvas.MouseLeftButtonUp -= SaturationCanvasMouseLeftButtonUp;
+                _saturationCanvas.MouseMove -= SaturationCanvasMouseMove;
+                _saturationCanvas.SizeChanged -= SaturationCanvasSizeChanged;
             }
 
-            _colorShadingCanvas = GetTemplateChild(PART_ColorShadingCanvas) as Canvas;
+            _saturationCanvas = GetTemplateChild(PART_SaturationCanvas) as Canvas;
 
-            if (_colorShadingCanvas != null)
+            if (_saturationCanvas != null)
             {
-                _colorShadingCanvas.MouseLeftButtonDown += ColorShadingCanvas_MouseLeftButtonDown;
-                _colorShadingCanvas.MouseLeftButtonUp += ColorShadingCanvas_MouseLeftButtonUp;
-                _colorShadingCanvas.MouseMove += ColorShadingCanvas_MouseMove;
-                _colorShadingCanvas.SizeChanged += ColorShadingCanvas_SizeChanged;
+                _saturationCanvas.MouseLeftButtonDown += SaturationCanvasMouseLeftButtonDown;
+                _saturationCanvas.MouseLeftButtonUp += SaturationCanvasMouseLeftButtonUp;
+                _saturationCanvas.MouseMove += SaturationCanvasMouseMove;
+                _saturationCanvas.SizeChanged += SaturationCanvasSizeChanged;
             }
 
-            _colorShadeSelector = GetTemplateChild(PART_ColorShadeSelector) as Canvas;
+            _saturationSelector = GetTemplateChild(PART_SaturationSelector) as Canvas;
 
-            if (_colorShadeSelector != null)
-                _colorShadeSelector.RenderTransform = _colorShadeSelectorTransform;
+            if (_saturationSelector != null)
+                _saturationSelector.RenderTransform = _saturationSelectorTransform;
 
 
 
@@ -447,6 +472,33 @@ namespace Xceed.Wpf.Toolkit
 
 
 
+            if (_spectrumCanvas != null)
+            {
+                _spectrumCanvas.MouseLeftButtonDown -= SpectrumCanvas_MouseLeftButtonDown;
+                _spectrumCanvas.MouseLeftButtonUp -= SpectrumCanvas_MouseLeftButtonUp;
+                _spectrumCanvas.MouseMove -= SpectrumCanvas_MouseMove;
+                _spectrumCanvas.SizeChanged -= SpectrumCanvas_SizeChanged;
+            }
+
+            _spectrumCanvas = GetTemplateChild(PART_SpectrumCanvas) as Canvas;
+
+            if (_spectrumCanvas != null)
+            {
+                _spectrumCanvas.MouseLeftButtonDown += SpectrumCanvas_MouseLeftButtonDown;
+                _spectrumCanvas.MouseLeftButtonUp += SpectrumCanvas_MouseLeftButtonUp;
+                _spectrumCanvas.MouseMove += SpectrumCanvas_MouseMove;
+                _spectrumCanvas.SizeChanged += SpectrumCanvas_SizeChanged;
+            }
+
+            _spectrumSelector = GetTemplateChild(PART_SpectrumSelector) as Canvas;
+
+            if (_spectrumSelector != null)
+                _spectrumSelector.RenderTransform = _spectrumSelectorTransform;
+
+            _spectrumDisplay = GetTemplateChild(PART_SpectrumDisplay) as Rectangle;
+
+            if (_spectrumDisplay != null)
+                CreateSpectrum();
 
 
 
@@ -454,13 +506,14 @@ namespace Xceed.Wpf.Toolkit
 
 
 
-            if (_spectrumSlider != null)
-                _spectrumSlider.ValueChanged -= SpectrumSlider_ValueChanged;
 
-            _spectrumSlider = GetTemplateChild(PART_SpectrumSlider) as ColorSpectrumSlider;
+            //if (_spectrumSlider != null)
+            //    _spectrumSlider.ValueChanged -= SpectrumSlider_ValueChanged;
 
-            if (_spectrumSlider != null)
-                _spectrumSlider.ValueChanged += SpectrumSlider_ValueChanged;
+            //_spectrumSlider = GetTemplateChild(PART_SpectrumSlider) as ColorSpectrumSlider;
+
+            //if (_spectrumSlider != null)
+            //    _spectrumSlider.ValueChanged += SpectrumSlider_ValueChanged;
 
             if (_hexadecimalTextBox != null)
                 _hexadecimalTextBox.LostFocus -= new RoutedEventHandler(HexadecimalTextBox_LostFocus);
@@ -471,7 +524,15 @@ namespace Xceed.Wpf.Toolkit
                 _hexadecimalTextBox.LostFocus += new RoutedEventHandler(HexadecimalTextBox_LostFocus);
 
             UpdateRGBValues(SelectedColor);
-            UpdateColorShadeSelectorPosition(SelectedColor);
+
+            _updateSaturationPosition = true;
+            _updateIntensityPosition = true;
+
+            UpdateHueAndSaturationSelectorPositions(SelectedColor);
+            UpdateIntensitySelectorPosition(Intensity);
+
+            _updateSaturationPosition = false;
+            _updateIntensityPosition = false;
 
             // When changing theme, HexadecimalString needs to be set since it is not binded.
             SetHexadecimalTextBoxTextProperty(GetFormatedColorString(SelectedColor));
@@ -497,51 +558,51 @@ namespace Xceed.Wpf.Toolkit
 
         #region Event Handlers
 
-        void ColorShadingCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        void SaturationCanvasMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (_colorShadingCanvas != null)
+            if (_saturationCanvas != null)
             {
-                Point p = e.GetPosition(_colorShadingCanvas);
+                Point p = e.GetPosition(_saturationCanvas);
                 
-                UpdateColorShadeSelectorPositionAndCalculateColor(p, true);
-                _colorShadingCanvas.CaptureMouse();
+                UpdateSaturationSelectorPositionAndCalculateColor(p, true);
+                _saturationCanvas.CaptureMouse();
                 //Prevent from closing ColorCanvas after mouseDown in ListView
                 e.Handled = true;
             }
         }
 
-        void ColorShadingCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        void SaturationCanvasMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (_colorShadingCanvas != null)
+            if (_saturationCanvas != null)
             {
-                _colorShadingCanvas.ReleaseMouseCapture();
+                _saturationCanvas.ReleaseMouseCapture();
             }
         }
 
-        void ColorShadingCanvas_MouseMove(object sender, MouseEventArgs e)
+        void SaturationCanvasMouseMove(object sender, MouseEventArgs e)
         {
-            if (_colorShadingCanvas != null)
+            if (_saturationCanvas != null)
             {
                 if (e.LeftButton == MouseButtonState.Pressed)
                 {
-                    Point p = e.GetPosition(_colorShadingCanvas);
-                    UpdateColorShadeSelectorPositionAndCalculateColor(p, true);
+                    Point p = e.GetPosition(_saturationCanvas);
+                    UpdateSaturationSelectorPositionAndCalculateColor(p, true);
                     Mouse.Synchronize();
                 }
             }
         }
 
-        void ColorShadingCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        void SaturationCanvasSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (_currentColorPosition != null)
+            if (_currentSaturationPosition != null)
             {
                 Point _newPoint = new Point
                 {
-                    X = ((Point)_currentColorPosition).X * e.NewSize.Width,
-                    Y = ((Point)_currentColorPosition).Y * e.NewSize.Height
+                    X = ((Point)_currentSaturationPosition).X * e.NewSize.Width,
+                    Y = ((Point)_currentSaturationPosition).Y * e.NewSize.Height
                 };
 
-                UpdateColorShadeSelectorPositionAndCalculateColor(_newPoint, false);
+                UpdateSaturationSelectorPositionAndCalculateColor(_newPoint, false);
             }
         }
 
@@ -565,10 +626,7 @@ namespace Xceed.Wpf.Toolkit
 
         void IntensityCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (_intensityCanvas != null)
-            {
-                _intensityCanvas.ReleaseMouseCapture();
-            }
+            _intensityCanvas?.ReleaseMouseCapture();
         }
 
         void IntensityCanvas_MouseMove(object sender, MouseEventArgs e)
@@ -600,17 +658,59 @@ namespace Xceed.Wpf.Toolkit
 
 
 
-
-
-
-
-        void SpectrumSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        void SpectrumCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if ((_currentColorPosition != null) && (this.SelectedColor != null))
+            if (_spectrumCanvas != null)
             {
-                CalculateColor((Point)_currentColorPosition);
+                //Point p = e.GetPosition(_intensityCanvas);
+                //UpdateIntensitySelectorPositionAndCalculateValue(p, true);
+                //_intensityCanvas.CaptureMouse();
+                ////Prevent from closing ColorCanvas after mouseDown in ListView
+                //e.Handled = true;
             }
         }
+
+        void SpectrumCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _spectrumCanvas?.ReleaseMouseCapture();
+        }
+
+        void SpectrumCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_spectrumCanvas != null)
+            {
+                if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    Point p = e.GetPosition(_spectrumCanvas);
+                    UpdateSpectrumSelectorPositionAndCalculateValue(p, true);
+                    Mouse.Synchronize();
+                }
+            }
+        }
+
+        void SpectrumCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (_currentIntensityPosition != null)
+            {
+                Point _newPoint = new Point
+                {
+                    X = ((Point)_currentIntensityPosition).X * e.NewSize.Width,
+                    Y = ((Point)_currentIntensityPosition).Y * e.NewSize.Height
+                };
+
+                UpdateIntensitySelectorPositionAndCalculateValue(_newPoint, false);
+            }
+        }
+
+
+
+        //void SpectrumSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        //{
+        //    if ((_currentSaturationPosition != null) && (this.SelectedColor != null))
+        //    {
+        //        CalculateSaturation((Point)_currentSaturationPosition);
+        //    }
+        //}
 
         void HexadecimalTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -658,7 +758,6 @@ namespace Xceed.Wpf.Toolkit
 
             _surpressColorPropertyChanged = true;
 
-            //A = color.Value.A;
             R = color.Value.R;
             G = color.Value.G;
             B = color.Value.B;
@@ -666,9 +765,10 @@ namespace Xceed.Wpf.Toolkit
             _surpressColorPropertyChanged = false;
         }
 
-        private void UpdateColorShadeSelectorPositionAndCalculateColor(Point p, bool calculateColor)
+        private double? _saturation;
+        private void UpdateSaturationSelectorPositionAndCalculateColor(Point p, bool calculateColor)
         {
-            if ((_colorShadingCanvas == null) || (_colorShadeSelector == null))
+            if ((_saturationCanvas == null) || (_saturationSelector == null))
                 return;
 
             if (p.Y < 0)
@@ -677,51 +777,58 @@ namespace Xceed.Wpf.Toolkit
             if (p.X < 0)
                 p.X = 0;
 
-            if (p.X > _colorShadingCanvas.ActualWidth)
-                p.X = _colorShadingCanvas.ActualWidth;
+            if (p.X > _saturationCanvas.ActualWidth)
+                p.X = _saturationCanvas.ActualWidth;
 
-            if (p.Y > _colorShadingCanvas.ActualHeight)
-                p.Y = _colorShadingCanvas.ActualHeight;
+            if (p.Y > _saturationCanvas.ActualHeight)
+                p.Y = _saturationCanvas.ActualHeight;
 
-            Console.WriteLine($"UpdateColor PRE: {p}");
-            _colorShadeSelectorTransform.X = p.X - (_colorShadeSelector.Width / 2);
-            _colorShadeSelectorTransform.Y = p.Y - (_colorShadeSelector.Height / 2);
+            _saturationSelectorTransform.X = p.X - (_saturationSelector.Width / 2);
+            _saturationSelectorTransform.Y = p.Y - (_saturationSelector.Height / 2);
 
-            p.X = p.X / _colorShadingCanvas.ActualWidth;
-            p.Y = p.Y / _colorShadingCanvas.ActualHeight;
+            p.X = p.X / _saturationCanvas.ActualWidth;
+            p.Y = p.Y / _saturationCanvas.ActualHeight;
 
-            Console.WriteLine($"UpdateColor POST: {p}");
-
-            if (p.Y < 1)
-            {
-
-            }
-            _currentColorPosition = p;
+            _currentSaturationPosition = p;
 
             if (calculateColor)
-                CalculateColor(p);
+                CalculateSaturation(p);
         }
 
-        private void UpdateColorShadeSelectorPosition(Color? color)
+        private void UpdateHueAndSaturationSelectorPositions(Color? color)
         {
-            if ((_spectrumSlider == null) || (_colorShadingCanvas == null) || (color == null) || !color.HasValue)
+            if (_spectrumCanvas == null
+                || _saturationCanvas == null
+                || !color.HasValue
+                || !_updateSaturationPosition)
+            {
                 return;
+            }
 
-            _currentColorPosition = null;
+            _currentSpectrumPosition = null;
+            _currentSaturationPosition = null;
 
             var hsv = ColorUtilities.ConvertRgbToHsv(color.Value.R, color.Value.G, color.Value.B);
 
-            if (_updateSpectrumSliderValue)
-            {
-                _spectrumSlider.Value = 360 - hsv.H;
-            }
+            //if (_updateSpectrumSliderValue)
+            //{
+            //    _spectrumSlider.Value = 360 - hsv.H;
+            //}
 
-            Point p = new Point(.5, 1 - hsv.S);
+            Point pHue = new Point(.5, 1 - (360 - hsv.H) / 360);
 
-            _currentColorPosition = p;
+            _currentSpectrumPosition = pHue;
 
-            _colorShadeSelectorTransform.X = (p.X * _colorShadingCanvas.Width) - 5;
-            _colorShadeSelectorTransform.Y = (p.Y * _colorShadingCanvas.Height) - 5;
+            _spectrumSelectorTransform.X = (pHue.X * _spectrumCanvas.Width) - 5;
+            _spectrumSelectorTransform.Y = (pHue.Y * _spectrumCanvas.Height) - 5;
+
+
+            Point pSaturation = new Point(.5, 1 - hsv.S);
+
+            _currentSaturationPosition = pSaturation;
+
+            _saturationSelectorTransform.X = (pSaturation.X * _saturationCanvas.Width) - 5;
+            _saturationSelectorTransform.Y = (pSaturation.Y * _saturationCanvas.Height) - 5;
         }
 
         private void UpdateIntensitySelectorPositionAndCalculateValue(Point p, bool calculateIntensity)
@@ -755,8 +862,22 @@ namespace Xceed.Wpf.Toolkit
 
         private void UpdateIntensitySelectorPosition(byte? val)
         {
-            //if ((_spectrumSlider == null) || (_colorShadingCanvas == null) || (color == null) || !color.HasValue)
-            //    return;
+            if (_spectrumCanvas == null
+                || _intensityCanvas == null
+                || !val.HasValue
+                || !_updateIntensityPosition)
+            {
+                return;
+            }
+            
+            _currentIntensityPosition = null;
+
+            Point p = new Point(.5, 1 - (int) val / 255.0);
+
+            _currentIntensityPosition = p;
+
+            _intensitySelectorTransform.X = p.X;
+            _intensitySelectorTransform.Y = p.Y;
 
             //_currentColorPosition = null;
 
@@ -775,14 +896,92 @@ namespace Xceed.Wpf.Toolkit
             //_colorShadeSelectorTransform.Y = (p.Y * _colorShadingCanvas.Height) - 5;
         }
 
-        private void CalculateColor(Point p)
+        private void UpdateSpectrumSelectorPositionAndCalculateValue(Point p, bool calculateColor)
         {
-            if (_spectrumSlider == null)
+            if ((_spectrumCanvas == null) || (_spectrumSelector == null))
                 return;
 
+            if (p.Y < 0)
+                p.Y = 0;
+
+            if (p.X < 0)
+                p.X = 0;
+
+            if (p.X > _spectrumCanvas.ActualWidth)
+                p.X = _spectrumCanvas.ActualWidth;
+
+            if (p.Y > _spectrumCanvas.ActualHeight)
+                p.Y = _spectrumCanvas.ActualHeight;
+
+            _spectrumSelectorTransform.X = p.X - (_spectrumSelector.Width / 2);
+            _spectrumSelectorTransform.Y = p.Y - (_spectrumSelector.Height / 2);
+
+            p.X = p.X / _spectrumCanvas.ActualWidth;
+            p.Y = p.Y / _spectrumCanvas.ActualHeight;
+
+            _currentSpectrumPosition = p;
+
+            if (calculateColor)
+            {
+                CalculateHue(p);
+            }
+        }
+
+        private double _hue;
+        private void CalculateHue(Point p)
+        {
+            _hue = p.Y * 360;
+            Color hue = ColorUtilities.ConvertHsvToRgb(_hue, 1, 1);
+            SelectedHue = hue;
+            Color color = ColorUtilities.ConvertHsvToRgb(_hue, _saturation ?? 1, 1);
+            SelectedColor = color;
+        }
+
+        private void UpdateSpectrumSelectorPosition(int? val)
+        {
+            if (_spectrumCanvas == null
+                || _intensityCanvas == null
+                || !val.HasValue
+                || !_updateIntensityPosition)
+            {
+                return;
+            }
+
+            _currentIntensityPosition = null;
+
+            Point p = new Point(.5, 1 - (int)val / 255.0);
+
+            _currentIntensityPosition = p;
+
+            _intensitySelectorTransform.X = p.X;
+            _intensitySelectorTransform.Y = p.Y;
+
+            //_currentColorPosition = null;
+
+            //var hsv = ColorUtilities.ConvertRgbToHsv(color.Value.R, color.Value.G, color.Value.B);
+
+            //if (_updateSpectrumSliderValue)
+            //{
+            //    _spectrumSlider.Value = 360 - hsv.H;
+            //}
+
+            //Point p = new Point(hsv.S, 1 - hsv.V);
+
+            //_currentColorPosition = p;
+
+            //_colorShadeSelectorTransform.X = (p.X * _colorShadingCanvas.Width) - 5;
+            //_colorShadeSelectorTransform.Y = (p.Y * _colorShadingCanvas.Height) - 5;
+        }
+
+        private void CalculateSaturation(Point p)
+        {
+            if (_spectrumCanvas == null)
+                return;
+
+            _saturation = 1 - p.Y;
             HsvColor hsv = new HsvColor(
-                360 - _spectrumSlider.Value,
-                1 - p.Y,
+                _hue,
+                _saturation.Value,
                 1);
             var currentColor = ColorUtilities.ConvertHsvToRgb(hsv.H, hsv.S, hsv.V);
             currentColor.A = 255;
@@ -794,7 +993,7 @@ namespace Xceed.Wpf.Toolkit
 
         private void CalculateIntensity(Point p)
         {
-            if (_spectrumSlider == null)
+            if (_spectrumCanvas == null)
                 return;
 
             const double epsilon = 1.0 / 255;
@@ -861,5 +1060,37 @@ namespace Xceed.Wpf.Toolkit
         }
 
         #endregion //Methods
+
+
+
+
+
+
+
+
+        private LinearGradientBrush _pickerBrush;
+        private void CreateSpectrum()
+        {
+            _pickerBrush = new LinearGradientBrush();
+            _pickerBrush.StartPoint = new Point(0.5, 0);
+            _pickerBrush.EndPoint = new Point(0.5, 1);
+            _pickerBrush.ColorInterpolationMode = ColorInterpolationMode.SRgbLinearInterpolation;
+
+            var colorsList = ColorUtilities.GenerateHsvSpectrum();
+
+            double stopIncrement = (double)1 / (colorsList.Count - 1);
+
+            int i;
+            for (i = 0; i < colorsList.Count; i++)
+            {
+                _pickerBrush.GradientStops.Add(new GradientStop(colorsList[i], i * stopIncrement));
+            }
+
+            _pickerBrush.GradientStops[i - 1].Offset = 1.0;
+            if (_spectrumDisplay != null)
+            {
+                _spectrumDisplay.Fill = _pickerBrush;
+            }
+        }
     }
 }

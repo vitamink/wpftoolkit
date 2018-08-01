@@ -221,9 +221,9 @@
                 </Grid.RowDefinitions>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.33*" />
-                        <ColumnDefinition Width="0.33*" />
-                        <ColumnDefinition Width="0.33*" />
+                        <ColumnDefinition Width="0.33333*" />
+                        <ColumnDefinition Width="0.33333*" />
+                        <ColumnDefinition Width="0.33333*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -234,19 +234,19 @@
                   BorderBrush="DarkGray"
                   ClipToBounds="True"
                   Background="{StaticResource CheckerBrush}">
-                        <Canvas x:Name="PART_ColorShadingCanvas"
+                        <Canvas x:Name="PART_SaturationCanvas"
 
                     Width="{Binding ElementName=_ColorShadingCanvas_Border, Path=ActualWidth}"
                     Height="300"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top">
                             <Rectangle x:Name="ColorShadingRectangle"
-                         Height="{Binding ElementName=PART_ColorShadingCanvas, Path=Height}"
-                         Width="{Binding ElementName=PART_ColorShadingCanvas, Path=Width}"
-                         Fill="{Binding SelectedColor, ElementName=PART_SpectrumSlider, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
+                         Height="{Binding ElementName=PART_SaturationCanvas, Path=Height}"
+                         Width="{Binding ElementName=PART_SaturationCanvas, Path=Width}"
+                         Fill="{Binding Path=SelectedHue, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ColorToSolidColorBrushConverter}}" />
                             <Rectangle x:Name="WhiteGradient"
-                         Width="{Binding ElementName=PART_ColorShadingCanvas,Path=Width}"
-                         Height="{Binding ElementName=PART_ColorShadingCanvas,Path=Height}">
+                         Width="{Binding ElementName=PART_SaturationCanvas,Path=Width}"
+                         Height="{Binding ElementName=PART_SaturationCanvas,Path=Height}">
                                 <Rectangle.Fill>
                                     <LinearGradientBrush StartPoint="0,1"
                                        EndPoint="0,0">
@@ -258,8 +258,8 @@
                                 </Rectangle.Fill>
                             </Rectangle>
                             <!--<Rectangle x:Name="BlackGradient"
-                         Width="{Binding ElementName=PART_ColorShadingCanvas,Path=Width}"
-                         Height="{Binding ElementName=PART_ColorShadingCanvas,Path=Height}">
+                         Width="{Binding ElementName=PART_SaturationCanvas,Path=Width}"
+                         Height="{Binding ElementName=PART_SaturationCanvas,Path=Height}">
                 <Rectangle.Fill>
                   <LinearGradientBrush StartPoint="0,1"
                                        EndPoint="0, 0">
@@ -270,7 +270,7 @@
                   </LinearGradientBrush>
                 </Rectangle.Fill>
               </Rectangle>-->
-                            <Canvas x:Name="PART_ColorShadeSelector"
+                            <Canvas x:Name="PART_SaturationSelector"
                       Width="10"
                       Height="10"
                       IsHitTestVisible="False">
@@ -313,64 +313,88 @@
                         </Grid>
                     </Border>
 
-                    <Border x:Name="_SpectrumSlider_Border" Grid.Column="1"
-                    Margin="4,-8,0,0"
-                    ClipToBounds="False">
-                        <local:ColorSpectrumSlider Width="{Binding ElementName=_SpectrumSlider_Border, Path=ActualWidth}" x:Name="PART_SpectrumSlider"
-                                           VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                        </local:ColorSpectrumSlider>
+
+                    <Border
+                        x:Name="_IntensityCanvas_Border"
+                        Grid.Column="2"
+                        BorderThickness="1"
+                        BorderBrush="DarkGray"
+                        ClipToBounds="True"
+                        Background="{StaticResource CheckerBrush}">
+                        <Canvas
+                            x:Name="PART_IntensityCanvas"
+                            Width="{Binding ElementName=_IntensityCanvas_Border, Path=ActualWidth}"
+                            Height="300"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top">
+                            <Rectangle
+                                x:Name="IntensityShadingRectangle"
+                                Height="{Binding ElementName=PART_IntensityCanvas, Path=Height}"
+                                Width="{Binding ElementName=PART_IntensityCanvas, Path=Width}">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                 EndPoint="0,1">
+                                        <GradientStop Offset="0"
+                                              Color="#ffffffff" />
+                                        <GradientStop Offset="1"
+                                              Color="#ff000000" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Canvas
+                                x:Name="PART_IntensitySelector"
+                                Width="10"
+                                Height="10"
+                                IsHitTestVisible="False">
+                                <Ellipse
+                                    Width="10"
+                                    Height="10"
+                                    StrokeThickness="3"
+                                    Stroke="#FFFFFFFF"
+                                    IsHitTestVisible="False" />
+                                <Ellipse
+                                    Width="10"
+                                    Height="10"
+                                    StrokeThickness="1"
+                                    Stroke="#FF000000"
+                                    IsHitTestVisible="False" />
+                            </Canvas>
+                        </Canvas>
                     </Border>
 
-                    <Border x:Name="_IntensityCanvas_Border" Grid.Column="2" BorderThickness="1"
-                  BorderBrush="DarkGray"
-                  ClipToBounds="True"
-                  Background="{StaticResource CheckerBrush}">
-                        <Canvas x:Name="PART_IntensityCanvas"
-                    Width="{Binding ElementName=_IntensityCanvas_Border, Path=ActualWidth}"
-                    Height="300"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top">
-                            <Rectangle x:Name="IntensityShadingRectangle"
-                         Height="{Binding ElementName=PART_IntensityCanvas, Path=Height}"
-                         Width="{Binding ElementName=PART_IntensityCanvas, Path=Width}"
-                          >
-                            <Rectangle.Fill>
-                            <LinearGradientBrush StartPoint="0,0"
-                                                 EndPoint="0,1">
-                                <GradientStop Offset="0"
-                                              Color="#ffffffff" />
-                                <GradientStop Offset="1"
-                                              Color="#ff000000" />
-                            </LinearGradientBrush>
-                            </Rectangle.Fill>
-                                </Rectangle>
-                            <!--<Rectangle x:Name="BlackGradient"
-                         Width="{Binding ElementName=PART_ColorShadingCanvas,Path=Width}"
-                         Height="{Binding ElementName=PART_ColorShadingCanvas,Path=Height}">
-                <Rectangle.Fill>
-                  <LinearGradientBrush StartPoint="0,1"
-                                       EndPoint="0, 0">
-                    <GradientStop Offset="0"
-                                  Color="#ff000000" />
-                    <GradientStop Offset="1"
-                                  Color="#00000000" />
-                  </LinearGradientBrush>
-                </Rectangle.Fill>
-              </Rectangle>-->
-                            <Canvas x:Name="PART_IntensitySelector"
-                      Width="10"
-                      Height="10"
-                      IsHitTestVisible="False">
-                                <Ellipse Width="10"
-                         Height="10"
-                         StrokeThickness="3"
-                         Stroke="#FFFFFFFF"
-                         IsHitTestVisible="False" />
-                                <Ellipse Width="10"
-                         Height="10"
-                         StrokeThickness="1"
-                         Stroke="#FF000000"
-                         IsHitTestVisible="False" />
+                    <Border
+                        x:Name="_SpectrumCanvas_Border"
+                        Grid.Column="1"
+                        BorderThickness="1"
+                        BorderBrush="DarkGray"
+                        ClipToBounds="True"
+                        Background="{StaticResource CheckerBrush}">
+                        <Canvas
+                            x:Name="PART_SpectrumCanvas"
+                            Width="{Binding ElementName=_SpectrumCanvas_Border, Path=ActualWidth}"
+                            Height="300"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top">
+                            <Rectangle x:Name="PART_SpectrumDisplay"
+                                Height="{Binding ElementName=PART_SpectrumCanvas, Path=Height}"
+                                Width="{Binding ElementName=PART_SpectrumCanvas, Path=Width}"/>
+                            <Canvas
+                                x:Name="PART_SpectrumSelector"
+                                Width="10"
+                                Height="10"
+                                IsHitTestVisible="False">
+                                <Ellipse
+                                    Width="10"
+                                    Height="10"
+                                    StrokeThickness="3"
+                                    Stroke="#FFFFFFFF"
+                                    IsHitTestVisible="False" />
+                                <Ellipse
+                                    Width="10"
+                                    Height="10"
+                                    StrokeThickness="1"
+                                    Stroke="#FF000000"
+                                    IsHitTestVisible="False" />
                             </Canvas>
                         </Canvas>
                     </Border>
@@ -378,12 +402,13 @@
 
                 </Grid>
 
-                <Border x:Name="RGBBorder"
-                MinWidth="180"
-                Grid.Row="1"
-                BorderThickness="1"
-                ClipToBounds="True"
-                Margin="0,10,0,0">
+                <Border
+                    x:Name="RGBBorder"
+                    MinWidth="180"
+                    Grid.Row="1"
+                    BorderThickness="1"
+                    ClipToBounds="True"
+                    Margin="0,10,0,0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -397,21 +422,22 @@
                             <ColumnDefinition Width="44" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Row="0"
-                       Grid.Column="0"
-                       Text="R"
-                       VerticalAlignment="Center">
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Text="R"
+                            VerticalAlignment="Center">
                         </TextBlock>
                         <Slider x:Name="PART_RSlider"
-                    Maximum="255"
-                    SmallChange="1"
-                    LargeChange="10"
-                    TickFrequency="1"
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Margin="4,6,4,6"
-                    Value="{Binding R, RelativeSource={RelativeSource TemplatedParent}}"
-                    VerticalAlignment="Center">
+                            Maximum="255"
+                            SmallChange="1"
+                            LargeChange="10"
+                            TickFrequency="1"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="4,6,4,6"
+                            Value="{Binding R, RelativeSource={RelativeSource TemplatedParent}}"
+                            VerticalAlignment="Center">
                         </Slider>
                         <local:ByteUpDown Grid.Row="0"
                               Grid.Column="2"
@@ -420,21 +446,23 @@
                               Background="Transparent">
                         </local:ByteUpDown>
 
-                        <TextBlock Grid.Row="1"
-                       Grid.Column="0"
-                       Text="G"
-                       VerticalAlignment="Center">
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Text="G"
+                            VerticalAlignment="Center">
                         </TextBlock>
-                        <Slider x:Name="PART_GSlider"
-                    Maximum="255"
-                    SmallChange="1"
-                    LargeChange="10"
-                    TickFrequency="1"
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Margin="4,6,4,6"
-                    Value="{Binding G, RelativeSource={RelativeSource TemplatedParent}}"
-                    VerticalAlignment="Center">
+                        <Slider
+                            x:Name="PART_GSlider"
+                            Maximum="255"
+                            SmallChange="1"
+                            LargeChange="10"
+                            TickFrequency="1"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="4,6,4,6"
+                            Value="{Binding G, RelativeSource={RelativeSource TemplatedParent}}"
+                            VerticalAlignment="Center">
                         </Slider>
                         <local:ByteUpDown Grid.Row="1"
                               Grid.Column="2"
@@ -443,21 +471,23 @@
                               Background="Transparent">
                         </local:ByteUpDown>
 
-                        <TextBlock Grid.Row="2"
-                       Grid.Column="0"
-                       Text="B"
-                       VerticalAlignment="Center">
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Text="B"
+                            VerticalAlignment="Center">
                         </TextBlock>
-                        <Slider x:Name="PART_BSlider"
-                    Maximum="255"
-                    SmallChange="1"
-                    LargeChange="10"
-                    TickFrequency="1"
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    Margin="4,6,4,6"
-                    Value="{Binding B, RelativeSource={RelativeSource TemplatedParent}}"
-                    VerticalAlignment="Center">
+                        <Slider
+                            x:Name="PART_BSlider"
+                            Maximum="255"
+                            SmallChange="1"
+                            LargeChange="10"
+                            TickFrequency="1"
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Margin="4,6,4,6"
+                            Value="{Binding B, RelativeSource={RelativeSource TemplatedParent}}"
+                            VerticalAlignment="Center">
                         </Slider>
                         <local:ByteUpDown Grid.Row="2"
                               Grid.Column="3"
@@ -466,30 +496,7 @@
                               Background="Transparent">
                         </local:ByteUpDown>
 
-                        <TextBlock Grid.Row="3"
-                       Grid.Column="0"
-                       Text="A"
-                       VerticalAlignment="Center"
-                       Visibility="{Binding Path=UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        </TextBlock>
-                        <Slider x:Name="PART_OpacitySlider"
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Maximum="255"
-                    SmallChange="1"
-                    LargeChange="10"
-                    Margin="4,6,4,6"
-                    Value="{Binding Path=A, RelativeSource={RelativeSource TemplatedParent}}"
-                    VerticalAlignment="Center"
-                    Visibility="{Binding Path=UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        </Slider>
-                        <local:ByteUpDown Grid.Row="3"
-                              Grid.Column="3"
-                              Value="{Binding Value, ElementName=PART_OpacitySlider}"
-                              VerticalAlignment="Center"
-                              Background="Transparent"
-                              Visibility="{Binding Path=UsingAlphaChannel, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        </local:ByteUpDown>
+                        
                     </Grid>
                 </Border>
             </Grid>
@@ -504,7 +511,7 @@
                Value="{x:Null}">
                 <Setter Property="Visibility"
                 Value="Collapsed"
-                TargetName="PART_ColorShadeSelector" />
+                TargetName="PART_SaturationSelector" />
                 <Setter Property="Background"
                 Value="Transparent"
                 TargetName="SelectedColorBorder" />
