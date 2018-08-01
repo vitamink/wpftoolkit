@@ -294,7 +294,10 @@ namespace Xceed.Wpf.Toolkit
                 {
                     col = (Color)ColorConverter.ConvertFromString(newColorString);
                 }
+
+                _updateColorPosition = true;
                 UpdateSelectedColor(col);
+                _updateColorPosition = false;
             }
 
             SetHexadecimalTextBoxTextProperty(newValue);
@@ -713,7 +716,7 @@ namespace Xceed.Wpf.Toolkit
                 _spectrumSlider.Value = 360 - hsv.H;
             }
 
-            Point p = new Point(hsv.S, 1 - hsv.V);
+            Point p = new Point(.5, 1 - hsv.S);
 
             _currentColorPosition = p;
 
