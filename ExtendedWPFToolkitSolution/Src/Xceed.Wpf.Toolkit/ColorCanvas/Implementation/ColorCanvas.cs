@@ -95,6 +95,7 @@ namespace Xceed.Wpf.Toolkit
             SetHexadecimalStringProperty(GetFormatedColorString(newValue), false);
             UpdateRGBValues(newValue);
             UpdateHueAndSaturationSelectorPositions(newValue);
+            SetSelectedHue(newValue);
 
             RoutedPropertyChangedEventArgs<Color?> args = new RoutedPropertyChangedEventArgs<Color?>(oldValue, newValue);
             args.RoutedEvent = SelectedColorChangedEvent;
@@ -662,11 +663,11 @@ namespace Xceed.Wpf.Toolkit
         {
             if (_spectrumCanvas != null)
             {
-                //Point p = e.GetPosition(_intensityCanvas);
-                //UpdateIntensitySelectorPositionAndCalculateValue(p, true);
-                //_intensityCanvas.CaptureMouse();
-                ////Prevent from closing ColorCanvas after mouseDown in ListView
-                //e.Handled = true;
+                Point p = e.GetPosition(_intensityCanvas);
+                UpdateSpectrumSelectorPositionAndCalculateValue(p, true);
+                _spectrumCanvas.CaptureMouse();
+                //Prevent from closing ColorCanvas after mouseDown in ListView
+                e.Handled = true;
             }
         }
 
@@ -698,19 +699,10 @@ namespace Xceed.Wpf.Toolkit
                     Y = ((Point)_currentIntensityPosition).Y * e.NewSize.Height
                 };
 
-                UpdateIntensitySelectorPositionAndCalculateValue(_newPoint, false);
+                UpdateSpectrumSelectorPositionAndCalculateValue(_newPoint, false);
             }
         }
 
-
-
-        //void SpectrumSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        //{
-        //    if ((_currentSaturationPosition != null) && (this.SelectedColor != null))
-        //    {
-        //        CalculateSaturation((Point)_currentSaturationPosition);
-        //    }
-        //}
 
         void HexadecimalTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -725,14 +717,8 @@ namespace Xceed.Wpf.Toolkit
         public static readonly RoutedEvent SelectedColorChangedEvent = EventManager.RegisterRoutedEvent("SelectedColorChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<Color?>), typeof(ColorCanvas));
         public event RoutedPropertyChangedEventHandler<Color?> SelectedColorChanged
         {
-            add
-            {
-                AddHandler(SelectedColorChangedEvent, value);
-            }
-            remove
-            {
-                RemoveHandler(SelectedColorChangedEvent, value);
-            }
+            add => AddHandler(SelectedColorChangedEvent, value);
+            remove => RemoveHandler(SelectedColorChangedEvent, value);
         }
 
         #endregion //Events
@@ -793,6 +779,18 @@ namespace Xceed.Wpf.Toolkit
 
             if (calculateColor)
                 CalculateSaturation(p);
+        }
+
+        private void SetSelectedHue(Color? color)
+        {
+            if (!color.HasValue)
+            {
+                SelectedHue = Colors.Transparent;
+            }
+
+            var hsv = ColorUtilities.ConvertRgbToHsv(color.Value.R, color.Value.G, color.Value.B);
+            _hue = hsv.H;
+            SelectedHue = ColorUtilities.ConvertHsvToRgb(_hue, 1, 1);
         }
 
         private void UpdateHueAndSaturationSelectorPositions(Color? color)
@@ -896,7 +894,7 @@ namespace Xceed.Wpf.Toolkit
             //_colorShadeSelectorTransform.Y = (p.Y * _colorShadingCanvas.Height) - 5;
         }
 
-        private void UpdateSpectrumSelectorPositionAndCalculateValue(Point p, bool calculateColor)
+        private void UpdateSpectrumSelectorPositionAndCalculateValue(Point p, bool calculateHue)
         {
             if ((_spectrumCanvas == null) || (_spectrumSelector == null))
                 return;
@@ -921,7 +919,7 @@ namespace Xceed.Wpf.Toolkit
 
             _currentSpectrumPosition = p;
 
-            if (calculateColor)
+            if (calculateHue)
             {
                 CalculateHue(p);
             }
@@ -930,10 +928,10 @@ namespace Xceed.Wpf.Toolkit
         private double _hue;
         private void CalculateHue(Point p)
         {
-            _hue = p.Y * 360;
-            Color hue = ColorUtilities.ConvertHsvToRgb(_hue, 1, 1);
-            SelectedHue = hue;
-            Color color = ColorUtilities.ConvertHsvToRgb(_hue, _saturation ?? 1, 1);
+            //_hue = p.Y * 360;
+            //Color hue = ColorUtilities.ConvertHsvToRgb(_hue, 1, 1);
+            //SelectedHue = hue;
+            Color color = ColorUtilities.ConvertHsvToRgb(p.Y * 360, _saturation ?? 1, 1);
             SelectedColor = color;
         }
 
